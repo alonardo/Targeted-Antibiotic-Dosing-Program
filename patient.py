@@ -14,6 +14,7 @@ class Patient():
           self.cystatin_c = cystatin_c
           self.blood_urine_nitrogen = blood_urine_nitrogen
           self.mic_of_organism = mic_of_organism
+          Patient.print_calculated_patient_info(self)
      
      def print_patient_info(self):
           print(f"""
@@ -118,14 +119,48 @@ class Patient():
           ******************************************************************************************
           """)
 
-andre = Patient('andre', 'lonardo', 'male', 20, 60, 65, 'african american', 3.2, 0.7, 1.5, 41, 8.0)
+     class Medication():
+          def __init__(self, dose, infusion_time, frequency, l):
+               self.dose = dose
+               self.infusion_time = infusion_time
+               self.frequency = frequency
+               self.l = l
+               # What is L in the volume of distribution calculation?
+               # In the Ml/MG formula, one variable multiplies and the other is added. What are these two variables?
+               # In half life calc, what is 0.693? What should the variable be called?
+          
+          def calc_rate(self):
+               self.rate = ((24 / self.frequency) * self.dose) / 24
+               print(f'Rate(mg/hr) {self.rate}')
+               return self.rate
+   
 
-andre.print_patient_info()
-andre.calc_bmi()
-andre.calc_grubb_equation()
-andre.calc_larsonns_equation()
-andre.calc_ideal_body_weight()
-andre.calc_adjusted_body_weight()
-andre.calc_cockcroft_gault()
-andre.calc_mdmr6()
-andre.print_calculated_patient_info()
+          def calc_volume_of_distribution(self):
+               adjbw = patient.calc_adjusted_body_weight()
+               vd = self.l * adjbw
+               print(f'VD: {vd}')
+               return vd
+
+
+patient = Patient('andre', 'lonardo', 'male', 20, 60, 65, 'african american', 3.2, 0.7, 1.5, 41, 8.0)
+piperacillin = patient.Medication(2000, 1, 12, 0.26)
+
+piperacillin.calc_rate()
+piperacillin.calc_volume_of_distribution()
+
+
+
+
+
+
+# andre = Patient('andre', 'lonardo', 'male', 20, 60, 65, 'african american', 3.2, 0.7, 1.5, 41, 8.0)
+
+# andre.print_patient_info()
+# andre.calc_bmi()
+# andre.calc_grubb_equation()
+# andre.calc_larsonns_equation()
+# andre.calc_ideal_body_weight()
+# andre.calc_adjusted_body_weight()
+# andre.calc_cockcroft_gault()
+# andre.calc_mdmr6()
+# andre.print_calculated_patient_info()
