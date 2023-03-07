@@ -16,8 +16,8 @@ class Patient():
           self.mic_of_organism = mic_of_organism
      
      def print_patient_info(self):
-          print('******************************************************************************************')
           print(f"""
+          ******************************************************************************************
           First Name: {self.first_name.title()}
           Last Name: {self.last_name.title()}
           Age: {self.age}
@@ -30,20 +30,8 @@ class Patient():
           Cystatin C(mg/dl): {self.cystatin_c}
           Blood Urine Nitrogen(BUN)(mg/dl): {self.blood_urine_nitrogen}
           Actual or presumed MIC of organism: {self.mic_of_organism}
+          ******************************************************************************************
           """)
-          # print(f'First Name: {self.first_name}'.title())
-          # print(f'Last Name: {self.last_name}'.title())
-          # print(f'Age: {self.age}')   
-          # print(f'Gender: {self.gender}'.title())
-          # print(f'Weight(kg): {self.weight}')
-          # print(f'Height(in): {self.height}')
-          # print(f'Ethnicity: {self.ethnicity}'.title())
-          # print(f'Albumin: {self.albumin_units}')
-          # print(f'Serum Creatine: {self.serum_creatine_units}')
-          # print(f'Cystatin C(mg/dL): {self.cystatin_c}')
-          # print(f'Blood Urine Nitrogen(BUN)(mg/dl): {self.blood_urine_nitrogen}')
-          # print(f'Actual or presumed MIC of organism: {self.mic_of_organism}')
-          print('******************************************************************************************')
 
      def calc_bmi(self):
          self.bmi = (self.weight / (self.height * 0.0254) ** 2)
@@ -118,8 +106,8 @@ class Patient():
           return self.mdmr
      
      def print_calculated_patient_info(self):
-          print('******************************************************************************************')
           print(f"""
+          ******************************************************************************************
           BMI: {self.calc_bmi()}
           Grubb equation: {self.calc_grubb_equation()}
           Larson's Equation: {self.calc_larsonns_equation()}
@@ -127,9 +115,8 @@ class Patient():
           Adjusted Body Weight: {self.calc_adjusted_body_weight()}
           Modified Cockcroft Gault: {self.calc_cockcroft_gault()}
           MDMR6: {self.calc_mdmr6()}
+          ******************************************************************************************
           """)
-          print('******************************************************************************************')
-
 
 andre = Patient('andre', 'lonardo', 'male', 20, 60, 65, 'african american', 3.2, 0.7, 1.5, 41, 8.0)
 
@@ -141,5 +128,4 @@ andre.calc_ideal_body_weight()
 andre.calc_adjusted_body_weight()
 andre.calc_cockcroft_gault()
 andre.calc_mdmr6()
-
 andre.print_calculated_patient_info()
