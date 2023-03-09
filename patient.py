@@ -1,3 +1,8 @@
+import math
+from rx import medications
+
+print(medications)
+
 class Patient():
     
      def __init__(self, first_name, last_name, gender, age, weight, height, ethnicity, albumin_units, serum_creatine_units, 
@@ -120,47 +125,114 @@ class Patient():
           """)
 
      class Medication():
-          def __init__(self, dose, infusion_time, frequency, l):
+          # Variables that should auto add
+          # liters, slope, non_renal_clearance, clearance_used, half_life, fcpss
+          def __init__(self, dose, infusion_time, frequency, liters, slope, non_renal_clearance, clearance_used, half_life, fcpss):
                self.dose = dose
                self.infusion_time = infusion_time
                self.frequency = frequency
-               self.l = l
-               # What is L in the volume of distribution calculation?
-               # In the Ml/MG formula, one variable multiplies and the other is added. What are these two variables?
-               # In half life calc, what is 0.693? What should the variable be called?
+               self.liters = liters
+               self.slope = slope
+               self.non_renal_clearance = non_renal_clearance
+               self.clearance_used = clearance_used
+               self.half_life = half_life
+               self.fcpss = fcpss
+          
+          def request_medicine(self):
+               self.patient_rx = input('Which medication would you like to use?\n')
+               for rx in medications:
+                    if self.patient_rx.lower() == rx['medication']:
+                              self.patient_rx = rx['medication']
+                              self.patient_rx_liters = rx['liters']
+                              self.patient_rx_slope = rx['slope']
+                              self.patient_rx_non_renal_clearance = rx['non_renal_clearance']
+                              self.patient_rx_half_life = rx['half_life']
+                              self.patient_rx_fcpss = rx['fcpss']
+                              break
+                    else:
+                         print('No medication found')
+                         continue
+               return [self.patient_rx, self.patient_rx_liters, self.patient_rx_slope, self.patient_rx_non_renal_clearance, self.patient_rx_half_life, self.patient_rx_fcpss]
           
           def calc_rate(self):
                self.rate = ((24 / self.frequency) * self.dose) / 24
                print(f'Rate(mg/hr) {self.rate}')
                return self.rate
-   
+
+          def calc_drug_clearance_ml_min(self):
+               self.drug_clearance_ml_min = (self.slope * self.clearance_used) + self.non_renal_clearance
+               print(f'Drug Clearance (mL/min): {self.drug_clearance_ml_min}')      
+               return self.drug_clearance_ml_min
+          
+          def calc_drug_clearance_l_hr(self):
+               self.drug_clearance_l_hr = self.drug_clearance_ml_min * 0.06
+               print(f'Drug Clearance (L/hr): {self.drug_clearance_l_hr}')
+               return self.drug_clearance_l_hr
 
           def calc_volume_of_distribution(self):
                adjbw = patient.calc_adjusted_body_weight()
-               vd = self.l * adjbw
-               print(f'VD: {vd}')
-               return vd
+               self.volume_distribution = self.liters * adjbw
+               print(f'VD: {self.volume_distribution}')
+               return self.volume_distribution
+          
+          # What do these values stand for? k hr -1
+          def calc_k_hr_1(self):
+               self.k_hr_1 = self.drug_clearance_l_hr / self.volume_distribution
+               print(f'K hr-1: {self.k_hr_1}')
+               return self.k_hr_1
+          
+          # In half life calc, what is 0.693? What should the variable be called?
+          def calc_half_life(self):
+               self.half_life_calculated = self.half_life / self.k_hr_1
+               print(f'Half-life(hr): {self.half_life_calculated}')
 
+          def calc_cpss_with_cl(self):
+               self.cpss_with_cl = (self.dose / self.frequency) / self.drug_clearance_l_hr
+               print(f'CpSS with Cl: {self.cpss_with_cl}')
+               return self.cpss_with_cl
+
+          def calc_cpss_max(self):
+               self.cpss_max = (self.dose / self.infusion_time) * (1 - math.exp(-self.k_hr_1 * (self.infusion_time))) / (self.volume_distribution * self.k_hr_1 * (1 - math.exp(-self.k_hr_1 * self.frequency)))
+               print(f'CpSS(Max): {self.cpss_max}')
+               return self.cpss_max
+
+          def calc_cpss_min(self):
+               self.cpss_min = self.cpss_max * math.exp(-self.k_hr_1 * (self.frequency - self.infusion_time))
+               print(f'CpSS(Min): {self.cpss_min}')
+               return self.cpss_min
+
+          # Tissue concentration
+          # What is the variable being subtracted by 1 called?
+          def calc_fcpss_ave_or_cl(self):
+               self.fcpss_calculated = (1 - self.fcpss) *self.cpss_with_cl
+               print(f'fCpSS(ave or Cl): {self.fcpss_calculated}')
+               return self.fcpss_calculated
+
+          def calc_fcpss_max(self):
+               self.fcpss_max = (1 - self.fcpss) * self.cpss_max
+               print(f'fCpSS(Max): {self.fcpss_max}')
+               return self.fcpss_max
+
+          def calc_fcpss_min(self):
+               self.fcpss_min = (1 - self.fcpss) * self.cpss_min
+               print(f'fCpSS(Min): {self.fcpss_min}')
+               return self.fcpss_min
+          
 
 patient = Patient('andre', 'lonardo', 'male', 20, 60, 65, 'african american', 3.2, 0.7, 1.5, 41, 8.0)
-piperacillin = patient.Medication(2000, 1, 12, 0.26)
+piperacillin = patient.Medication(2000, 1, 12, 0.3, 1.36,105, 150, 0.693, 0.16)
 
 piperacillin.calc_rate()
 piperacillin.calc_volume_of_distribution()
+piperacillin.calc_drug_clearance_ml_min()
+piperacillin.calc_drug_clearance_l_hr()
+piperacillin.calc_k_hr_1()
+piperacillin.calc_half_life()
+piperacillin.calc_cpss_with_cl()
+piperacillin.calc_cpss_max()
+piperacillin.calc_cpss_min()
+piperacillin.calc_fcpss_ave_or_cl()
+piperacillin.calc_fcpss_max()
+piperacillin.calc_fcpss_min()
 
 
-
-
-
-
-# andre = Patient('andre', 'lonardo', 'male', 20, 60, 65, 'african american', 3.2, 0.7, 1.5, 41, 8.0)
-
-# andre.print_patient_info()
-# andre.calc_bmi()
-# andre.calc_grubb_equation()
-# andre.calc_larsonns_equation()
-# andre.calc_ideal_body_weight()
-# andre.calc_adjusted_body_weight()
-# andre.calc_cockcroft_gault()
-# andre.calc_mdmr6()
-# andre.print_calculated_patient_info()
