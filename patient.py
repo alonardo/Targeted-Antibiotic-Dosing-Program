@@ -1,12 +1,10 @@
 import math
 from rx import medications
 
-print(medications)
-
 class Patient():
-    
      def __init__(self, first_name, last_name, gender, age, weight, height, ethnicity, albumin_units, serum_creatine_units, 
           cystatin_c, blood_urine_nitrogen, mic_of_organism):
+
           self.first_name = first_name
           self.last_name = last_name
           self.age = age
@@ -19,7 +17,7 @@ class Patient():
           self.cystatin_c = cystatin_c
           self.blood_urine_nitrogen = blood_urine_nitrogen
           self.mic_of_organism = mic_of_organism
-          Patient.print_calculated_patient_info(self)
+          # Patient.print_calculated_patient_info(self)
      
      def print_patient_info(self):
           print(f"""
@@ -102,7 +100,7 @@ class Patient():
           else:
                gender = 0.85
 
-          if self.ethnicity == 'african american'          :
+          if self.ethnicity == 'african american':
                ethnicity = 1.18
           else:
                ethnicity = 1
@@ -128,32 +126,81 @@ class Patient():
           # Variables that should auto add
           # liters, slope, non_renal_clearance, clearance_used, half_life, fcpss
           def __init__(self, dose, infusion_time, frequency, liters, slope, non_renal_clearance, clearance_used, half_life, fcpss):
+               self.ui_prompt = False
+               self.request_medicine()
                self.dose = dose
                self.infusion_time = infusion_time
                self.frequency = frequency
-               self.liters = liters
-               self.slope = slope
-               self.non_renal_clearance = non_renal_clearance
                self.clearance_used = clearance_used
-               self.half_life = half_life
-               self.fcpss = fcpss
-          
+               self.liters = self.rx_specs[1]
+               self.slope = self.rx_specs[2]
+               self.non_renal_clearance = self.rx_specs[3]
+               self.half_life = self.rx_specs[4]
+               self.fcpss = self.rx_specs[5]
+               
           def request_medicine(self):
-               self.patient_rx = input('Which medication would you like to use?\n')
-               for rx in medications:
-                    if self.patient_rx.lower() == rx['medication']:
-                              self.patient_rx = rx['medication']
-                              self.patient_rx_liters = rx['liters']
-                              self.patient_rx_slope = rx['slope']
-                              self.patient_rx_non_renal_clearance = rx['non_renal_clearance']
-                              self.patient_rx_half_life = rx['half_life']
-                              self.patient_rx_fcpss = rx['fcpss']
-                              break
+               while True:
+                    user_input = input('Which medication would you like to use?\n')  
+                    match_found = False 
+                    for rx in medications:
+                         if user_input.lower() == rx['medication']:
+                                   self.patient_rx = rx['medication']
+                                   self.patient_rx_liters = rx['liters']
+                                   self.patient_rx_slope = rx['slope']
+                                   self.patient_rx_non_renal_clearance = rx['non_renal_clearance']
+                                   self.patient_rx_half_life = rx['half_life']
+                                   self.patient_rx_fcpss = rx['fcpss']
+                                   match_found = True
+                                   break
+                    if match_found:
+                         break
                     else:
-                         print('No medication found')
-                         continue
-               return [self.patient_rx, self.patient_rx_liters, self.patient_rx_slope, self.patient_rx_non_renal_clearance, self.patient_rx_half_life, self.patient_rx_fcpss]
-          
+                         print('No match found') 
+
+               self.rx_specs = [self.patient_rx, self.patient_rx_liters, self.patient_rx_slope, self.patient_rx_non_renal_clearance, self.patient_rx_half_life, self.patient_rx_fcpss]
+               return self.rx_specs
+
+          def calc_all_drug(self):
+               self.calc_rate()
+               self.calc_drug_clearance_ml_min()
+               self.calc_drug_clearance_l_hr()
+               self.calc_volume_of_distribution()
+               self.calc_k_hr_1()
+               self.calc_half_life()
+               self.calc_cpss_with_cl()
+               self.calc_cpss_max()
+               self.calc_cpss_min()
+               self.calc_fcpss_ave_or_cl()
+               self.calc_fcpss_max()
+               self.calc_fcpss_min()
+
+
+          def print_calculated_patient_drug_info(self):
+               print(f"""
+               ******************************************************************************************
+               Medication Name: {self.rx_specs[0]}
+               Dose: {self.dose}
+               Infusion Time: {self.infusion_time}
+               Frequency(hr): {self.frequency}
+               Rate(mg/hr): {self.rate}
+
+               {self.rx_specs[0]} CL(mL/min): {self.drug_clearance_ml_min}
+               {self.rx_specs[0]} CL(L/hr): {self.drug_clearance_l_hr}
+               Volume of Distribution: {self.volume_distribution}
+               K hr-1: {self.k_hr_1}
+               Half Life(hr): {self.half_life}
+
+               CpSS with Cl: {self.cpss_with_cl}
+               CpSS(Max): {self.cpss_max}
+               CpSS(Min): {self.cpss_min}
+
+               Tissue Conc
+               fCpSS(ave or Cl): {self.fcpss_calculated}
+               fCpSS(Max): {self.fcpss_max}
+               fCpSS(Min): {self.fcpss_min}
+               ******************************************************************************************
+               """)          
+
           def calc_rate(self):
                self.rate = ((24 / self.frequency) * self.dose) / 24
                print(f'Rate(mg/hr) {self.rate}')
@@ -220,19 +267,30 @@ class Patient():
           
 
 patient = Patient('andre', 'lonardo', 'male', 20, 60, 65, 'african american', 3.2, 0.7, 1.5, 41, 8.0)
+patient.calc_bmi()
+patient.calc_ideal_body_weight()
+patient.calc_adjusted_body_weight()
+patient.calc_grubb_equation()
+patient.calc_larsonns_equation()
+patient.calc_cockcroft_gault()
+patient.calc_mdmr6()
+
+
 piperacillin = patient.Medication(2000, 1, 12, 0.3, 1.36,105, 150, 0.693, 0.16)
 
-piperacillin.calc_rate()
-piperacillin.calc_volume_of_distribution()
-piperacillin.calc_drug_clearance_ml_min()
-piperacillin.calc_drug_clearance_l_hr()
-piperacillin.calc_k_hr_1()
-piperacillin.calc_half_life()
-piperacillin.calc_cpss_with_cl()
-piperacillin.calc_cpss_max()
-piperacillin.calc_cpss_min()
-piperacillin.calc_fcpss_ave_or_cl()
-piperacillin.calc_fcpss_max()
-piperacillin.calc_fcpss_min()
+# piperacillin.calc_rate()
+# piperacillin.calc_volume_of_distribution()
+# piperacillin.calc_drug_clearance_ml_min()
+# piperacillin.calc_drug_clearance_l_hr()
+# piperacillin.calc_k_hr_1()
+# piperacillin.calc_half_life()
+# piperacillin.calc_cpss_with_cl()
+# piperacillin.calc_cpss_max()
+# piperacillin.calc_cpss_min()
+# piperacillin.calc_fcpss_ave_or_cl()
+# piperacillin.calc_fcpss_max()
+# piperacillin.calc_fcpss_min()
 
+piperacillin.calc_all_drug()
+piperacillin.print_calculated_patient_drug_info()
 

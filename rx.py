@@ -46,21 +46,22 @@ medications =  [{
             ]
 
 
-def request_medicine():
-    patient_rx = input('Which medication would you like to use?\n')
-    for rx in medications:
-        if patient_rx.lower() == rx['medication']:
-                patient_rx = rx['medication']
-                patient_rx_liters = rx['liters']
-                patient_rx_slope = rx['slope']
-                patient_rx_non_renal_clearance = rx['non_renal_clearance']
-                patient_rx_half_life = rx['half_life']
-                patient_rx_fcpss = rx['fcpss']
-                break
-        else:
-            print('No medication found')
-            continue
-    return [patient_rx, patient_rx_liters, patient_rx_slope, patient_rx_non_renal_clearance, patient_rx_half_life, patient_rx_fcpss]
+# def request_medicine():
+#     user_input = input('Which medication would you like to use?\n')
+#     for rx in medications:
+#         if user_input.lower() == rx['medication']:
+#                 patient_rx = rx['medication']
+#                 patient_rx_liters = rx['liters']
+#                 patient_rx_slope = rx['slope']
+#                 patient_rx_non_renal_clearance = rx['non_renal_clearance']
+#                 patient_rx_half_life = rx['half_life']
+#                 patient_rx_fcpss = rx['fcpss']
+#                 print('here')
+#                 break
+#         else:
+#             print('No medication found')
+
+#     return [patient_rx, patient_rx_liters, patient_rx_slope, patient_rx_non_renal_clearance, patient_rx_half_life, patient_rx_fcpss]
     
 
-request_medicine()
+# request_medicine()
